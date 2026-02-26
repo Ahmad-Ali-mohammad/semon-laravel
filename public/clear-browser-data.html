@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظيف بيانات المتصفح</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .btn {
+            background: #d93025; /* More accessible red */
+            color: #ffffff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #c0392b;
+        }
+        .btn.success {
+            background: #27ae60;
+        }
+        .btn.success:hover {
+            background: #229954;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .info-box {
+            background: #e8f4f8;
+            padding: 20px;
+            border-right: 4px solid #3498db;
+            margin: 20px 0;
+        }
+        .credentials {
+            background: #ffe6e6;
+            padding: 20px;
+            border-right: 4px solid #e74c3c;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .server-box{margin-top:30px;padding:20px;background:#fff8dc;border:2px dashed #ff9800;border-radius:5px}
+        .info-plain{margin-top:30px;padding:20px;background:#f8f9fa;border-radius:5px}
+        .btn.warning{background:#ff9800}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 تنظيف بيانات المتصفح</h1>
+        
+        <div class="credentials">
+            <h3>🔐 بيانات الاعتماد الجديدة:</h3>
+            <p>البريد الإلكتروني: <code>admin@semo.com</code></p>
+            <p>كلمة المرور: <code>admin123</code></p>
+        </div>
+
+        <div class="info-box">
+            <h3>⚠️ مهم جداً:</h3>
+            <p>يجب تنظيف جميع البيانات المخزنة في المتصفح قبل تسجيل الدخول بالحساب الجديد لضمان عدم تحميل بيانات قديمة.</p>
+        </div>
+
+        <div class="status" id="status"></div>
+
+        <h3>اضغط على الأزرار التالية بالترتيب:</h3>
+        
+        <button class="btn" onclick="clearAllData()">
+            1️⃣ مسح جميع البيانات (localStorage + sessionStorage + Cookies)
+        </button>
+        
+        <button class="btn success" onclick="redirectToLogin()">
+            2️⃣ الانتقال إلى صفحة تسجيل الدخول
+        </button>
+
+        <div class="server-box">
+            <h4>🚀 هل تريد تشغيل السيرفرات؟</h4>
+            <p>لتشغيل Laravel Backend و Vite Frontend تلقائياً:</p>
+            <button class="btn warning" onclick="window.open('http://localhost:5173', '_blank'); alert('⚠️ تأكد من تشغيل الملف: start-servers.bat\n\nمسار الملف:\ne:\\\\semo-main (2)\\\\semo-main\\\\start-servers.bat')">
+                🚀 تشغيل السيرفرات (افتح start-servers.bat)
+            </button>
+        </div>
+
+        <div class="info-plain">
+            <h4>ما الذي سيتم مسحه:</h4>
+            <ul>
+                <li>جميع بيانات localStorage (البيانات المحلية المخزنة)</li>
+                <li>جميع بيانات sessionStorage (بيانات الجلسة الحالية)</li>
+                <li>جميع Cookies (ملفات تعريف الارتباط)</li>
+                <li>ذاكرة التخزين المؤقت للمتصفح</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function clearAllData() {
+            try {
+                // مسح localStorage
+                localStorage.clear();
+                
+                // مسح sessionStorage
+                sessionStorage.clear();
+                
+                // مسح جميع Cookies
+                for (const c of document.cookie.split(';')) {
+                    document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+                }
+                
+                // عرض رسالة النجاح
+                const status = document.getElementById('status');
+                status.className = 'status success';
+                status.style.display = 'block';
+                status.innerHTML = '✅ تم مسح جميع البيانات بنجاح! يمكنك الآن الانتقال إلى صفحة تسجيل الدخول.';
+                
+                console.log('✅ تم مسح جميع البيانات المحلية والـ Cookies');
+            } catch (error) {
+                const status = document.getElementById('status');
+                status.className = 'status warning';
+                status.style.display = 'block';
+                status.innerHTML = '⚠️ حدث خطأ: ' + error.message;
+            }
+        }
+
+        function redirectToLogin() {
+            // تنظيف نهائي قبل الانتقال
+            clearAllData();
+            
+            // الانتقال إلى صفحة تسجيل الدخول
+            setTimeout(() => {
+                globalThis.location.href = 'http://localhost:5173/login';
+            }, 500);
+        }
+
+        // إظهار تحذير عند التحميل
+        globalThis.addEventListener('load', () => {
+            const status = document.getElementById('status');
+            status.className = 'status warning';
+            status.style.display = 'block';
+            status.innerHTML = '⚠️ استخدم الأزرار أعلاه لتنظيف البيانات قبل تسجيل الدخول';
+        });
+    </script>
+</body>
+</html>

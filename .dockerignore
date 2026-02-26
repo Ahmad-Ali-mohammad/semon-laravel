@@ -1,0 +1,215 @@
+# =============================================================================
+# .dockerignore - ملف تجاهل الملفات في Docker
+# .dockerignore - Docker ignore file
+# =============================================================================
+# هذا الملف يحدد الملفات والمجلدات التي يجب على Docker تجاهلها عند بناء الصورة
+# This file specifies files and directories that Docker should ignore when building
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# مجلدات العقد (Dependencies)
+# Node modules directories
+# -----------------------------------------------------------------------------
+# لا نحتاج لنسخ node_modules لأنها ستُعاد تثبيتها
+# We don't need to copy node_modules as they will be reinstalled
+node_modules/
+backend/vendor/
+
+# -----------------------------------------------------------------------------
+# ملفات البيئة (Environment files)
+# -----------------------------------------------------------------------------
+# ملفات البيئة تحتوي على معلومات حساسة
+# Environment files contain sensitive information
+.env
+.env.local
+.env.*.local
+.env.backup
+.env.production.local
+
+# -----------------------------------------------------------------------------
+# ملفات Git
+# Git files
+# -----------------------------------------------------------------------------
+# معلومات Git غير مطلوبة في الصورة
+# Git information not needed in image
+.git/
+.gitignore
+.gitattributes
+
+# -----------------------------------------------------------------------------
+# ملفات IDE والمحررات
+# IDE and editor files
+# -----------------------------------------------------------------------------
+# إعدادات المحررات غير مطلوبة
+# Editor settings not needed
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# -----------------------------------------------------------------------------
+# ملفات السجلات والتخزين المؤقت
+# Log and cache files
+# -----------------------------------------------------------------------------
+# سجلات التطبيق والتخزين المؤقت
+# Application logs and cache
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+backend/storage/logs/*.log
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/bootstrap/cache/*
+
+# -----------------------------------------------------------------------------
+# ملفات التكوين المؤقتة
+# Temporary configuration files
+# -----------------------------------------------------------------------------
+phpunit.result.cache
+.phpunit.result.cache
+.php-cs-fixer.cache
+
+# -----------------------------------------------------------------------------
+# ملفات الاختبار
+# Test files
+# -----------------------------------------------------------------------------
+# ملفات الاختبار غير مطلوبة في الإنتاج
+# Test files not needed in production
+backend/tests/
+coverage/
+.phpunit.result.cache
+jest.coverage/
+
+# -----------------------------------------------------------------------------
+# ملفات التوثيق
+# Documentation files
+# -----------------------------------------------------------------------------
+# ملفات Markdown والتوثيق
+# Markdown and documentation files
+*.md
+README*
+CHANGELOG*
+LICENSE*
+SECURITY*
+CONTRIBUTING*
+
+# -----------------------------------------------------------------------------
+# ملفات الإعدادات الخاصة بالتطوير
+# Development configuration files
+# -----------------------------------------------------------------------------
+# ملفات التطوير غير مطلوبة
+# Development files not needed
+.eslintrc.cjs
+.eslintignore
+.prettierrc
+.prettierignore
+.stylelintrc
+.editorconfig
+tsconfig.json
+vite.config.ts
+jest.config.js
+jest.setup.ts
+postcss.config.js
+tailwind.config.js
+
+# -----------------------------------------------------------------------------
+# ملفات النسخ الاحتياطي
+# Backup files
+# -----------------------------------------------------------------------------
+*.bak
+*.backup
+*.swp
+*.tmp
+*.temp
+
+# -----------------------------------------------------------------------------
+# ملفات Docker نفسها (لمنع التكرار)
+# Docker files themselves (to prevent recursion)
+# -----------------------------------------------------------------------------
+Dockerfile
+docker-compose*.yml
+.docker/
+
+# -----------------------------------------------------------------------------
+# مجلدات البناء والتوزيع
+# Build and distribution directories
+# -----------------------------------------------------------------------------
+# dist/ - نحتاج dist/ للواجهة الأمامية المبنية، لذا لا نتجاهله
+# نتجاهل فقط في حالة التطوير
+# dist/ - we need dist/ for built frontend, so we don't ignore it
+# Only ignore in development context
+dist/
+build/
+
+# -----------------------------------------------------------------------------
+# ملفات النظام
+# System files
+# -----------------------------------------------------------------------------
+Thumbs.db
+.DS_Store
+*.lnk
+
+# -----------------------------------------------------------------------------
+# ملفات التكوين الأخرى
+# Other configuration files
+# -----------------------------------------------------------------------------
+# ملفات CI/CD
+# CI/CD files
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# ملفات Docker أخرى
+# Other Docker files
+docker/mysql/data/
+docker/ssl/*.pem
+docker/ssl/*.key
+
+# -----------------------------------------------------------------------------
+# ملفات محددة للمشروع
+# Project specific files
+# -----------------------------------------------------------------------------
+# ملفات السكربتات المحلية
+# Local script files
+*.bat
+*.sh
+start-app.bat
+start-servers.bat
+start-servers.ps1
+reset-database.bat
+reset-database.sh
+wipe-database-complete.bat
+verify-setup.bat
+verify-setup.sh
+
+# ملفات مؤقتة أخرى
+# Other temporary files
+nul
+.snapshots/
+.codacy/
+.cursor/
+.zencoder/
+.zenflow/
+
+# ملفات التدقيق والمراقبة
+# Audit and monitoring files
+audit.txt
+
+# ملفات التوثيق الإضافية
+# Additional documentation files
+*-COMPLETE.md
+*-GUIDE.md
+*-SUMMARY.md
+*-CHECKLIST.md
+backup-recovery.md
+monitoring-setup.md
+production-testing.md
+ssl-config.md
+SUMMARY.md
+TODO.md
