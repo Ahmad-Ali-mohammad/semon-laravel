@@ -20,8 +20,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # تثبيت اعتماديات Node.js
-# Install Node.js dependencies
-RUN npm ci --only=production
+# Install Node.js dependencies (including dev dependencies for build)
+RUN npm ci
 
 # نسخ باقي ملفات المشروع
 # Copy the rest of the application
@@ -73,22 +73,22 @@ RUN apt-get update && apt-get install -y \
     # تثبيت إضافات PHP المطلوبة
     # Install required PHP extensions
     && docker-php-ext-install \
-        # اتصال قاعدة البيانات - Database connection
-        pdo_mysql \
-        # معالجة النصوص متعددة البايت - Multibyte string processing
-        mbstring \
-        # معالجة البيانات الوصفية للصور - Image metadata processing
-        exif \
-        # التحكم في العمليات - Process control
-        pcntl \
-        # العمليات الحسابية - Mathematical operations
-        bcmath \
-        # معالجة الصور - Image processing
-        gd \
-        # ضغط الملفات - ZIP compression
-        zip \
-        # جلسات العمل - Sessions
-        sockets
+    # اتصال قاعدة البيانات - Database connection
+    pdo_mysql \
+    # معالجة النصوص متعددة البايت - Multibyte string processing
+    mbstring \
+    # معالجة البيانات الوصفية للصور - Image metadata processing
+    exif \
+    # التحكم في العمليات - Process control
+    pcntl \
+    # العمليات الحسابية - Mathematical operations
+    bcmath \
+    # معالجة الصور - Image processing
+    gd \
+    # ضغط الملفات - ZIP compression
+    zip \
+    # جلسات العمل - Sessions
+    sockets
 
 # -----------------------------------------------------------------------------
 # تنظيف ذاكرة التخزين المؤقت لتقليل حجم الصورة
@@ -183,50 +183,50 @@ WORKDIR /var/www/html
 # إنشاء سكربت بدء التشغيل
 # Create startup script
 RUN echo '#!/bin/bash\n\
-# =============================================================================\n#
-# سكربت بدء تشغيل التطبيق\n# Application startup script\n#
-# =============================================================================\n\
-\n\
-echo "========================================"\n\
-echo "بدء تشغيل SEMO Application..."\n\
-echo "Starting SEMO Application..."\n\
-echo "========================================"\n\
-\n\
-# الانتظار حتى تكون قاعدة البيانات جاهزة\n# Wait for database to be ready\n\
-sleep 5\n\
-\n\
-# تنفيذ أوامر Laravel\n# Execute Laravel commands\n\
-cd /var/www/html/backend\n\
-\n\
-# إنشاء مفتاح التطبيق إذا لم يكن موجوداً\n# Generate app key if not exists\n\
-if [ -z "$APP_KEY" ]; then\n\
+    # =============================================================================\n#
+    # سكربت بدء تشغيل التطبيق\n# Application startup script\n#
+    # =============================================================================\n\
+    \n\
+    echo "========================================"\n\
+    echo "بدء تشغيل SEMO Application..."\n\
+    echo "Starting SEMO Application..."\n\
+    echo "========================================"\n\
+    \n\
+    # الانتظار حتى تكون قاعدة البيانات جاهزة\n# Wait for database to be ready\n\
+    sleep 5\n\
+    \n\
+    # تنفيذ أوامر Laravel\n# Execute Laravel commands\n\
+    cd /var/www/html/backend\n\
+    \n\
+    # إنشاء مفتاح التطبيق إذا لم يكن موجوداً\n# Generate app key if not exists\n\
+    if [ -z "$APP_KEY" ]; then\n\
     php artisan key:generate --ansi\n\
-fi\n\
-\n\
-# تشغيل الهجرات\n# Run migrations\n\
-php artisan migrate --force --ansi\n\
-\n\
-# تحسين الأداء\n# Performance optimizations\n\
-php artisan config:cache\n\
-php artisan route:cache\n\
-php artisan view:cache\n\
-php artisan event:cache\n\
-\n\
-# إنشاء رابط تخزين\n# Create storage link\n\
-php artisan storage:link --ansi 2>/dev/null || true\n\
-\n\
-# ضبط الأذونات النهائية\n# Final permissions setup\n\
-chown -R www-data:www-data /var/www/html\n\
-chmod -R 775 /var/www/html/backend/storage\n\
-chmod -R 775 /var/www/html/backend/bootstrap/cache\n\
-\n\
-echo "========================================"\n\
-echo "تم بدء التطبيق بنجاح!"\n\
-echo "Application started successfully!"\n\
-echo "========================================"\n\
-\n\
-# بدء Apache في المقدمة\n# Start Apache in foreground\n\
-exec apache2-foreground' > /usr/local/bin/start.sh \
+    fi\n\
+    \n\
+    # تشغيل الهجرات\n# Run migrations\n\
+    php artisan migrate --force --ansi\n\
+    \n\
+    # تحسين الأداء\n# Performance optimizations\n\
+    php artisan config:cache\n\
+    php artisan route:cache\n\
+    php artisan view:cache\n\
+    php artisan event:cache\n\
+    \n\
+    # إنشاء رابط تخزين\n# Create storage link\n\
+    php artisan storage:link --ansi 2>/dev/null || true\n\
+    \n\
+    # ضبط الأذونات النهائية\n# Final permissions setup\n\
+    chown -R www-data:www-data /var/www/html\n\
+    chmod -R 775 /var/www/html/backend/storage\n\
+    chmod -R 775 /var/www/html/backend/bootstrap/cache\n\
+    \n\
+    echo "========================================"\n\
+    echo "تم بدء التطبيق بنجاح!"\n\
+    echo "Application started successfully!"\n\
+    echo "========================================"\n\
+    \n\
+    # بدء Apache في المقدمة\n# Start Apache in foreground\n\
+    exec apache2-foreground' > /usr/local/bin/start.sh \
     && chmod +x /usr/local/bin/start.sh
 
 # -----------------------------------------------------------------------------
