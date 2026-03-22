@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useDatabase } from '../contexts/DatabaseContext';
 import { ChevronRightIcon, UserIcon, BellIcon } from '../components/icons';
+import { seoService } from '../services/seoService';
 
 interface ArticleDetailsPageProps {
     articleId: number;
@@ -15,7 +16,10 @@ const ArticleDetailsPage: React.FC<ArticleDetailsPageProps> = ({ articleId, setP
     useEffect(() => {
         window.scrollTo(0, 0);
         loadArticles().catch(() => undefined);
-    }, [articleId, loadArticles]);
+        if (article) {
+            seoService.initializePage(`article/${articleId}`);
+        }
+    }, [articleId, loadArticles, article]);
 
     if (!article) {
         return (

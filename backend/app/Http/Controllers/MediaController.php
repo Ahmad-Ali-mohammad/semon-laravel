@@ -38,8 +38,10 @@ class MediaController extends Controller
         $media = MediaItem::findOrFail($id);
         $url = $media->url;
 
-        if (str_contains($url, '/storage/')) {
-            $relative = ltrim(str_replace('/storage/', '', $url), '/');
+        // Extract relative path from absolute URL
+        $path = parse_url($url, PHP_URL_PATH);
+        if ($path && str_contains($path, '/storage/')) {
+            $relative = ltrim(str_replace('/storage/', '', $path), '/');
             Storage::disk('public')->delete($relative);
         }
 

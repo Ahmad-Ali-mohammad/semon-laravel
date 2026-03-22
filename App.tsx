@@ -116,6 +116,15 @@ const AppContent: React.FC = () => {
     };
 
     useEffect(() => {
+        const handleNavigation = () => {
+            setCurrentPage(resolveInitialPage());
+        };
+
+        window.addEventListener('popstate', handleNavigation);
+        return () => window.removeEventListener('popstate', handleNavigation);
+    }, []);
+
+    useEffect(() => {
         const isAdminRoute = currentPage.startsWith('dashboard');
         if (isAdminRoute) {
             if (!user || (user.role !== 'admin' && user.role !== 'manager')) {
