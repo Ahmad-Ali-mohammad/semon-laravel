@@ -23,9 +23,9 @@ class ShamCashConfigUpdateRequest extends FormRequest
     {
         return [
             'barcode_image_url' => ['nullable', 'string', 'max:2048'],
-            'account_code' => ['nullable', 'string', 'max:255'],
+            'account_code' => ['required_if:is_active,true', 'nullable', 'string', 'max:255'],
             'account_holder_name' => ['nullable', 'string', 'max:255'],
-            'phone_number' => ['nullable', 'string', 'max:50'],
+            'phone_number' => ['nullable', 'string', 'max:50', 'regex:/^[\+]?[0-9\s\-\(\)]{10,20}$/'],
             'payment_instructions' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
         ];

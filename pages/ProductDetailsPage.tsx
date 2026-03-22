@@ -9,6 +9,7 @@ import { Page } from '../App';
 import { Reptile } from '../types';
 import TabsSystem, { TabItem } from '../components/TabSystem';
 import ReptileCard from '../components/ReptileCard';
+import { seoService } from '../services/seoService';
 
 interface ProductDetailsPageProps {
     productId: number;
@@ -49,7 +50,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId, setP
 
     useEffect(() => {
         if (reptile) {
-            document.title = `${reptile.name} - Reptile House`;
+            seoService.initializePage(`product/${productId}`);
             addView(reptile.id);
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
