@@ -1,0 +1,3 @@
+## 2025-05-15 - [React Performance Optimization]
+**Learning:** In complex React applications with centralized state contexts (like `DatabaseContext`), components consuming the context (like `HomePage`) re-render on *any* state change (e.g., a new order, a profile update). This makes derived computations (sorting/filtering) and child component renders expensive if not memoized.
+**Action:** Always use `useMemo` for derived data in components that consume large contexts, and combine `useCallback` with `React.memo` for child components to prevent unnecessary subtree re-renders. Add `loading="lazy"` to images below the fold to improve initial performance.
