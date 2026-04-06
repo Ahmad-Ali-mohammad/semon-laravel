@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Hero from '../components/Hero';
 import FeaturedReptiles from '../components/FeaturedReptiles';
 import SocialSection from '../components/SocialSection';
@@ -12,10 +12,26 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
   const { products, articles, loadArticles } = useDatabase();
-  const featured = products.find(p => p.rating >= 4.9) || products[0];
-  const bestsellers = [...products].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 5);
-  const newArrivals = [...products].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10);
-  const careSheets = [...articles].slice(0, 6);
+
+  const featured = useMemo(() =>
+    products.find(p => p.rating >= 4.9) || products[0],
+    [products]
+  );
+
+  const bestsellers = useMemo(() =>
+    [...products].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 5),
+    [products]
+  );
+
+  const newArrivals = useMemo(() =>
+    [...products].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10),
+    [products]
+  );
+
+  const careSheets = useMemo(() =>
+    [...articles].slice(0, 6),
+    [articles]
+  );
 
   useEffect(() => {
     loadArticles().catch(() => undefined);
@@ -84,7 +100,12 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
               className="text-right glass-medium rounded-[2.5rem] overflow-hidden border border-white/10 hover:border-amber-500/40 transition-all duration-500 shadow-2xl group active:scale-[0.99]"
             >
               <div className="relative aspect-[16/10] overflow-hidden">
-                <img src={article.image} alt={article.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-6 right-6 left-6">
                   <h3 className="text-2xl font-black leading-tight">{article.title}</h3>
