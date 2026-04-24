@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -110,10 +109,11 @@ const AppContent: React.FC = () => {
         ? currentPage.replace('dashboard/', '')
         : 'dashboard');
 
-    const setPage = (page: string) => {
+    // Performance Optimization: Memoize navigation callback to prevent re-renders of the entire layout
+    const setPage = useCallback((page: string) => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    }, []);
 
     useEffect(() => {
         const isAdminRoute = currentPage.startsWith('dashboard');
@@ -127,7 +127,7 @@ const AppContent: React.FC = () => {
         } else {
             setAppMode('user');
         }
-    }, [currentPage, user]);
+    }, [currentPage, user, setPage]);
 
     return (
         <div className="bg-gray-900 text-white min-h-screen flex flex-col pb-20 md:pb-0 relative">
