@@ -1,0 +1,3 @@
+## 2025-05-15 - [React Performance Bundle for Product Catalog]
+**Learning:** In a custom-routed React application without a framework like Next.js, top-level navigation callbacks (like `setPage`) must be stabilized with `useCallback` to prevent the entire component tree from re-rendering on every state change. Additionally, derived lists in pages (featured, bestsellers) should be memoized with `useMemo` to avoid O(N log N) sorting costs on every render.
+**Action:** Always check the root component for unstable callback props and ensure product cards are memoized with `React.memo` and use native `loading='lazy'` with a smart index-based eager loading for LCP.
