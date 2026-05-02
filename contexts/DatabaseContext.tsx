@@ -489,7 +489,7 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setProducts(prev => prev.filter(p => p.id !== id));
   };
 
-  const addProduct = async (product: Reptile): Promise<void> => {
+  const addProduct = useCallback(async (product: Reptile): Promise<void> => {
     const payload = toApiProductPayload(product);
     const action = (product.id && product.id > 0)
       ? api.updateProduct(product.id, payload as any)
@@ -501,15 +501,15 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const deleteProduct = (id: number) => {
+  const deleteProduct = useCallback((id: number) => {
     api.deleteProduct(id).then(() => deleteProductState(id)).catch(handleError);
-  };
+  }, []);
 
-  const toggleProductVisibility = (id: number) => {
+  const toggleProductVisibility = useCallback((id: number) => {
     api.toggleProductVisibility(id).then(updateProductsState).catch(handleError);
-  };
+  }, []);
 
   const addAddressState = (newAddress: Address) => {
     setAddresses(prev => [normalizeAddress(newAddress), ...prev]);
@@ -519,13 +519,13 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setAddresses(prev => prev.filter(a => a.id !== id));
   };
 
-  const addAddress = (address: Address) => {
+  const addAddress = useCallback((address: Address) => {
     api.createAddress(address).then(addAddressState).catch(handleError);
-  };
+  }, []);
 
-  const removeAddress = (id: number) => {
+  const removeAddress = useCallback((id: number) => {
     api.deleteAddress(id).then(() => deleteAddressState(id)).catch(handleError);
-  };
+  }, []);
 
   const updateArticlesState = (updated: any) => {
     setArticles(prev => addOrUpdateItem(prev, updated, normalizeArticle));
@@ -535,7 +535,7 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setArticles(prev => prev.filter(a => a.id !== id));
   };
 
-  const addArticle = async (article: Article) => {
+  const addArticle = useCallback(async (article: Article) => {
     const action = (article.id && article.id > 0)
       ? api.updateArticle(article.id, article)
       : api.createArticle(article);
@@ -546,15 +546,15 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const deleteArticle = (id: number) => {
+  const deleteArticle = useCallback((id: number) => {
     api.deleteArticle(id).then(() => deleteArticleState(id)).catch(handleError);
-  };
+  }, []);
 
-  const toggleArticleVisibility = (id: number) => {
+  const toggleArticleVisibility = useCallback((id: number) => {
     api.toggleArticleVisibility(id).then(updateArticlesState).catch(handleError);
-  };
+  }, []);
 
   const updateHeroSlidesState = (updated: any) => {
     setHeroSlides(prev => addOrUpdateItem(prev, updated, normalizeHero));
@@ -564,7 +564,7 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setHeroSlides(prev => prev.filter(h => h.id !== id));
   };
 
-  const saveHeroSlide = async (slide: HeroSlide) => {
+  const saveHeroSlide = useCallback(async (slide: HeroSlide) => {
     const action = slide.id ? api.updateHeroSlide(slide.id, slide) : api.createHeroSlide(slide);
     try {
       const saved = await action;
@@ -573,17 +573,17 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const deleteHeroSlide = (id: string) => {
+  const deleteHeroSlide = useCallback((id: string) => {
     api.deleteHeroSlide(id).then(() => deleteHeroSlideState(id)).catch(handleError);
-  };
+  }, []);
 
-  const toggleHeroSlideVisibility = (id: string) => {
+  const toggleHeroSlideVisibility = useCallback((id: string) => {
     api.toggleHeroSlideVisibility(id).then(updateHeroSlidesState).catch(handleError);
-  };
+  }, []);
 
-  const createOrder = async (order: Order): Promise<Order> => {
+  const createOrder = useCallback(async (order: Order): Promise<Order> => {
     try {
       const saved = await api.createOrder(order);
       await refreshData();
@@ -592,24 +592,24 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const updateOrder = (id: string, status: Order['status']) => {
+  const updateOrder = useCallback((id: string, status: Order['status']) => {
     api.updateOrderStatus(id, status).then(() => refreshData()).catch(handleError);
-  };
+  }, []);
 
-  const deleteOrder = async (id: string) => {
+  const deleteOrder = useCallback(async (id: string) => {
     try {
       await api.deleteOrder(id);
       setOrders(prev => prev.filter(o => o.id !== id));
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
-  const updateOrderPaymentStatus = (orderId: string, paymentStatus: Order['paymentVerificationStatus'], rejectionReason?: string) => {
+  const updateOrderPaymentStatus = useCallback((orderId: string, paymentStatus: Order['paymentVerificationStatus'], rejectionReason?: string) => {
     api.updatePaymentStatus(orderId, paymentStatus, rejectionReason).then(() => refreshData()).catch(handleError);
-  };
+  }, []);
 
   const updateUsersState = (updated: User) => {
     const normalized = normalizeUser(updated);
@@ -620,12 +620,12 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setUsers(prev => prev.filter(u => u.id !== id));
   };
 
-  const updateUser = (user: User) => {
+  const updateUser = useCallback((user: User) => {
     if (!user.id) return;
     api.updateUser(user.id, user).then(updateUsersState).catch(handleError);
-  };
+  }, []);
 
-  const createUser = async (user: Partial<User> & { password: string }): Promise<void> => {
+  const createUser = useCallback(async (user: Partial<User> & { password: string }): Promise<void> => {
     try {
       const created = await api.createUser(user as any);
       setUsers(prev => [normalizeUser(created), ...prev]);
@@ -633,15 +633,15 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const deleteUser = (id: string) => {
+  const deleteUser = useCallback((id: string) => {
     api.deleteUser(id).then(() => deleteUserState(id)).catch(handleError);
-  };
+  }, []);
 
-  const toggleUserStatus = (id: string) => {
+  const toggleUserStatus = useCallback((id: string) => {
     api.toggleUserStatus(id).then(updateUsersState).catch(handleError);
-  };
+  }, []);
 
   const updateSuppliesState = (updated: any) => {
     setSupplies(prev => addOrUpdateItem(prev, updated, normalizeSupply));
@@ -651,7 +651,7 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     setSupplies(prev => prev.filter(s => s.id !== id));
   };
 
-  const addSupply = async (supply: Supply): Promise<void> => {
+  const addSupply = useCallback(async (supply: Supply): Promise<void> => {
     const action = (supply.id && supply.id > 0)
       ? api.updateSupply(supply.id, supply)
       : api.createSupply(supply);
@@ -662,42 +662,42 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const deleteSupply = (id: number) => {
+  const deleteSupply = useCallback((id: number) => {
     api.deleteSupply(id).then(() => deleteSupplyState(id)).catch(handleError);
-  };
+  }, []);
 
-  const toggleSupplyVisibility = (id: number) => {
+  const toggleSupplyVisibility = useCallback((id: number) => {
     api.toggleSupplyVisibility(id).then(updateSuppliesState).catch(handleError);
-  };
+  }, []);
 
-  const addFilterGroup = (group: FilterGroup) => {
+  const addFilterGroup = useCallback((group: FilterGroup) => {
     const idStr = group.id;
     const id = idStr.includes('-') ? Number.parseInt(idStr.split('-')[1]) : Number.parseInt(idStr);
     const action = (id && id > 0)
       ? api.updateFilter(id, group)
       : api.createFilter(group);
     action.then(() => refreshData()).catch(handleError);
-  };
+  }, []);
 
-  const deleteFilterGroup = (id: number | string) => {
+  const deleteFilterGroup = useCallback((id: number | string) => {
     const idStr = id.toString();
     const numericId = idStr.includes('-') ? Number.parseInt(idStr.split('-')[1]) : Number.parseInt(idStr);
     if (numericId) {
       api.deleteFilter(numericId).then(() => refreshData()).catch(handleError);
     }
-  };
+  }, []);
 
-  const toggleFilterVisibility = (id: number | string) => {
+  const toggleFilterVisibility = useCallback((id: number | string) => {
     const idStr = id.toString();
     const numericId = idStr.includes('-') ? Number.parseInt(idStr.split('-')[1]) : Number.parseInt(idStr);
     if (numericId) {
       api.toggleFilterVisibility(numericId).then(() => refreshData()).catch(handleError);
     }
-  };
+  }, []);
 
-  const updateCompanyInfo = async (info: CompanyInfo): Promise<void> => {
+  const updateCompanyInfo = useCallback(async (info: CompanyInfo): Promise<void> => {
     try {
       const updated = await api.updateCompanyInfo(info);
       setCompanyInfo(updated);
@@ -705,13 +705,13 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const updateContactInfo = (info: ContactInfo) => {
+  const updateContactInfo = useCallback((info: ContactInfo) => {
     api.updateContactInfo(info).then(updated => setContactInfo(updated)).catch(handleError);
-  };
+  }, []);
 
-  const updateShamCashConfig = async (config: ShamCashConfig): Promise<void> => {
+  const updateShamCashConfig = useCallback(async (config: ShamCashConfig): Promise<void> => {
     try {
       const updated = await api.updateShamcashConfig(config);
       setShamCashConfig(updated);
@@ -719,20 +719,20 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const addCustomCategory = (cat: { value: string; label: string }) => {
+  const addCustomCategory = useCallback((cat: { value: string; label: string }) => {
     api.createCustomCategory(cat).then(() => refreshData()).catch(handleError);
-  };
-  const addCustomSpecies = (spec: string) => {
+  }, []);
+  const addCustomSpecies = useCallback((spec: string) => {
     api.createCustomSpecies({ name: spec }).then(() => refreshData()).catch(handleError);
-  };
-  const deleteCustomCategory = (id: number) => {
+  }, []);
+  const deleteCustomCategory = useCallback((id: number) => {
     api.deleteCustomCategory(id).then(() => refreshData()).catch(handleError);
-  };
-  const deleteCustomSpecies = (id: number) => {
+  }, []);
+  const deleteCustomSpecies = useCallback((id: number) => {
     api.deleteCustomSpecies(id).then(() => refreshData()).catch(handleError);
-  };
+  }, []);
 
   const updateServicesStateAdd = useCallback((svc: Service) => {
     setServices(prev => {
@@ -767,7 +767,7 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, [updateServicesStateAdd]);
 
   // Team Members CRUD
-  const addTeamMember = async (member: TeamMember, imageFile?: File): Promise<void> => {
+  const addTeamMember = useCallback(async (member: TeamMember, imageFile?: File): Promise<void> => {
     const formData = new FormData();
     if (member.name) formData.append('name', member.name);
     if (member.role) formData.append('role', member.role);
@@ -794,28 +794,28 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const deleteTeamMember = async (id: number) => {
+  const deleteTeamMember = useCallback(async (id: number) => {
     try {
       await api.deleteTeamMember(id);
       setTeamMembers(prev => prev.filter(m => m.id !== id));
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
-  const toggleTeamMemberVisibility = async (id: number) => {
+  const toggleTeamMemberVisibility = useCallback(async (id: number) => {
     try {
       await api.toggleTeamMemberVisibility(id);
       await refreshData();
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
   // Promotions CRUD
-  const addPromotion = async (promo: PromotionalCard): Promise<void> => {
+  const addPromotion = useCallback(async (promo: PromotionalCard): Promise<void> => {
     try {
       if (promo.id) {
         await api.updatePromotion(promo.id, promo);
@@ -827,28 +827,28 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
       handleError(error);
       throw error;
     }
-  };
+  }, []);
 
-  const deletePromotion = async (id: string | number) => {
+  const deletePromotion = useCallback(async (id: string | number) => {
     try {
       await api.deletePromotion(id);
       setPromotions(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
-  const togglePromotionVisibility = async (id: string | number) => {
+  const togglePromotionVisibility = useCallback(async (id: string | number) => {
     try {
       await api.togglePromotionVisibility(id);
       await refreshData();
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
   // Policies CRUD
-  const addPolicy = async (policy: PolicyDocument) => {
+  const addPolicy = useCallback(async (policy: PolicyDocument) => {
     try {
       if (policy.id) {
         await api.updatePolicy(policy.id, policy);
@@ -859,25 +859,25 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
-  const deletePolicy = async (id: string | number) => {
+  const deletePolicy = useCallback(async (id: string | number) => {
     try {
       await api.deletePolicy(id);
       setPolicies(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
-  const togglePolicyVisibility = async (id: string | number) => {
+  const togglePolicyVisibility = useCallback(async (id: string | number) => {
     try {
       await api.togglePolicyVisibility(id);
       await refreshData();
     } catch (err) {
       handleError(err);
     }
-  };
+  }, []);
 
   const contextValue = useMemo(() => ({
     products,
@@ -954,7 +954,19 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     companyInfo, contactInfo, shamCashConfig, teamMembers, customCategories, customSpecies,
     services, promotions, policies, isLoading, refreshData,
     addService, deleteService, toggleServiceVisibility,
-    loadUserData, loadAdminData, loadArticles, loadTeamMembers
+    loadUserData, loadAdminData, loadArticles, loadTeamMembers,
+    addProduct, deleteProduct, toggleProductVisibility,
+    addAddress, removeAddress, createOrder, updateOrder, deleteOrder, updateOrderPaymentStatus,
+    addArticle, deleteArticle, toggleArticleVisibility,
+    saveHeroSlide, deleteHeroSlide, toggleHeroSlideVisibility,
+    updateUser, createUser, deleteUser, toggleUserStatus,
+    addSupply, deleteSupply, toggleSupplyVisibility,
+    addFilterGroup, deleteFilterGroup, toggleFilterVisibility,
+    updateCompanyInfo, updateContactInfo, updateShamCashConfig,
+    addCustomCategory, addCustomSpecies, deleteCustomCategory, deleteCustomSpecies,
+    addTeamMember, deleteTeamMember, toggleTeamMemberVisibility,
+    addPromotion, deletePromotion, togglePromotionVisibility,
+    addPolicy, deletePolicy, togglePolicyVisibility
   ]);
 
   return (
