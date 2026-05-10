@@ -15,7 +15,8 @@ interface ReptileCardProps {
     setPage?: (page: string) => void;
 }
 
-const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant = 'grid', setPage }) => {
+// BOLT OPTIMIZATION: Memoize ReptileCard to prevent unnecessary re-renders in large lists
+const ReptileCard: React.FC<ReptileCardProps> = React.memo(({ reptile, index = 0, variant = 'grid', setPage }) => {
     const { user } = useAuth();
     const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
@@ -165,6 +166,8 @@ const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant =
             </div>
         </div>
     );
-};
+});
+
+ReptileCard.displayName = 'ReptileCard';
 
 export default ReptileCard;
