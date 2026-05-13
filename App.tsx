@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -110,10 +110,11 @@ const AppContent: React.FC = () => {
         ? currentPage.replace('dashboard/', '')
         : 'dashboard');
 
-    const setPage = (page: string) => {
+    // BOLT OPTIMIZATION: Stabilize setPage callback to prevent cascading re-renders in all consumers.
+    const setPage = useCallback((page: string) => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    }, []);
 
     useEffect(() => {
         const isAdminRoute = currentPage.startsWith('dashboard');
