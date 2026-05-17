@@ -110,10 +110,11 @@ const AppContent: React.FC = () => {
         ? currentPage.replace('dashboard/', '')
         : 'dashboard');
 
-    const setPage = (page: string) => {
+    // BOLT OPTIMIZATION: Stabilize setPage reference to prevent cascading re-renders in Header, Footer, and Page components.
+    const setPage = React.useCallback((page: string) => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    }, []);
 
     useEffect(() => {
         const isAdminRoute = currentPage.startsWith('dashboard');
