@@ -1,0 +1,3 @@
+## 2026-06-01 - [Component & Computation Optimization Pass]
+**Learning:** Found that the HomePage was re-sorting and re-slicing a large product array (1000 items) on every render, adding ~0.9ms of overhead. Also, lack of callback stabilization in App.tsx was causing unnecessary re-renders of the entire card list even when data didn't change.
+**Action:** Use `useMemo` for any sorting/filtering on datasets > 100 items. Always stabilize top-level navigation callbacks with `useCallback` when passed to `React.memo` components. Use `loading="lazy"` on list images, except for the first 2 to preserve LCP.
