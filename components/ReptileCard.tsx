@@ -15,7 +15,7 @@ interface ReptileCardProps {
     setPage?: (page: string) => void;
 }
 
-const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant = 'grid', setPage }) => {
+const ReptileCard = React.memo<ReptileCardProps>(({ reptile, index = 0, variant = 'grid', setPage }) => {
     const { user } = useAuth();
     const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
@@ -165,6 +165,8 @@ const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant =
             </div>
         </div>
     );
-};
+});
+
+ReptileCard.displayName = 'ReptileCard';
 
 export default ReptileCard;
