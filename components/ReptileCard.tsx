@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Reptile } from '../types';
 import { StarIcon, HeartIconOutline, HeartIconSolid, ShoppingCartIcon } from './icons';
 import { useWishlist } from '../hooks/useWishlist';
@@ -15,7 +15,8 @@ interface ReptileCardProps {
     setPage?: (page: string) => void;
 }
 
-const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant = 'grid', setPage }) => {
+// BOLT OPTIMIZATION: Memoize ReptileCard to prevent unnecessary re-renders in large lists
+const ReptileCard: React.FC<ReptileCardProps> = memo(({ reptile, index = 0, variant = 'grid', setPage }) => {
     const { user } = useAuth();
     const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
@@ -65,7 +66,12 @@ const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant =
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="w-full sm:w-32 h-48 sm:h-32 flex-shrink-0 overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl relative z-10">
-                    <img src={reptile.imageUrl} alt={reptile.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <img
+                        src={reptile.imageUrl}
+                        alt={reptile.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading={index < 2 ? 'eager' : 'lazy'}
+                    />
                 </div>
                 <div className="flex-1 sm:px-8 text-right relative z-10 w-full">
                     <div className="flex items-center gap-3 mb-2">
@@ -111,6 +117,7 @@ const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant =
                     src={reptile.imageUrl}
                     alt={reptile.name}
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 group-hover:brightness-110"
+                    loading={index < 2 ? 'eager' : 'lazy'}
                 />
 
                 {/* Hover Overlay with Button */}
@@ -165,6 +172,8 @@ const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant =
             </div>
         </div>
     );
-};
+});
+
+ReptileCard.displayName = 'ReptileCard';
 
 export default ReptileCard;
