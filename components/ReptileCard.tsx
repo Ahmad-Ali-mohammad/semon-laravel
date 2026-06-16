@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Reptile } from '../types';
 import { StarIcon, HeartIconOutline, HeartIconSolid, ShoppingCartIcon } from './icons';
 import { useWishlist } from '../hooks/useWishlist';
@@ -15,7 +15,12 @@ interface ReptileCardProps {
     setPage?: (page: string) => void;
 }
 
-const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant = 'grid', setPage }) => {
+/**
+ * BOLT OPTIMIZATION: Memoize ReptileCard component to prevent unnecessary re-renders.
+ * Especially important for large lists on the Home and Showcase pages.
+ * Re-renders only when reptile or navigation props change.
+ */
+const ReptileCard: React.FC<ReptileCardProps> = memo(({ reptile, index = 0, variant = 'grid', setPage }) => {
     const { user } = useAuth();
     const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const { addToCart } = useCart();
@@ -165,6 +170,6 @@ const ReptileCard: React.FC<ReptileCardProps> = ({ reptile, index = 0, variant =
             </div>
         </div>
     );
-};
+});
 
 export default ReptileCard;
