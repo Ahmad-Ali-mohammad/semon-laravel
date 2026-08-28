@@ -12,10 +12,28 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
   const { products, articles, loadArticles } = useDatabase();
-  const featured = products.find(p => p.rating >= 4.9) || products[0];
-  const bestsellers = [...products].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 5);
-  const newArrivals = [...products].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10);
-  const careSheets = [...articles].slice(0, 6);
+
+  // ⚡ BOLT OPTIMIZATION: Memoize derived lists to prevent sorting and copying overhead on every render cycle.
+  // Using direct .slice().sort() avoids spreading [...products] and prevents re-calculating lists when DatabaseContext triggers re-renders.
+  const featured = React.useMemo(() => {
+    return products.find(p => p.rating >= 4.9) || products[0];
+  }, [products]);
+
+  const bestsellers = React.useMemo(() => {
+    return products.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 5);
+  }, [products]);
+
+  const newArrivals = React.useMemo(() => {
+    return products.slice().sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10);
+  }, [products]);
+
+  const careSheets = React.useMemo(() => {
+    return articles.slice(0, 6);
+  }, [articles]);
+
+  const featuredReptilesList = React.useMemo(() => {
+    return products.slice(0, 6);
+  }, [products]);
 
   useEffect(() => {
     loadArticles().catch(() => undefined);
@@ -98,7 +116,7 @@ const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
         </div>
       </section>
 
-      <FeaturedReptiles reptiles={products.slice(0, 6)} setPage={setPage} />
+      <FeaturedReptiles reptiles={featuredReptilesList} setPage={setPage} />
       <SocialSection />
     </>
   );
