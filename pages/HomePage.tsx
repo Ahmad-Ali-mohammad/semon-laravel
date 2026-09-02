@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Hero from '../components/Hero';
 import FeaturedReptiles from '../components/FeaturedReptiles';
 import SocialSection from '../components/SocialSection';
@@ -12,10 +12,18 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ setPage }) => {
   const { products, articles, loadArticles } = useDatabase();
-  const featured = products.find(p => p.rating >= 4.9) || products[0];
-  const bestsellers = [...products].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 5);
-  const newArrivals = [...products].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10);
-  const careSheets = [...articles].slice(0, 6);
+
+  // BOLT OPTIMIZATION: Memoize derived product and article calculations to avoid sorting/slicing overhead on every render
+  const featured = useMemo(() => products.find(p => p.rating >= 4.9) || products[0], [products]);
+  const bestsellers = useMemo(
+    () => products.slice().sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 5),
+    [products]
+  );
+  const newArrivals = useMemo(
+    () => products.slice().sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 10),
+    [products]
+  );
+  const careSheets = useMemo(() => articles.slice(0, 6), [articles]);
 
   useEffect(() => {
     loadArticles().catch(() => undefined);
