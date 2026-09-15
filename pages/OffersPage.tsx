@@ -8,6 +8,12 @@ interface OffersPageProps {
     setPage: (page: Page) => void;
 }
 
+interface PromotionWithTimestamps {
+    offer: PromotionalCard;
+    startMs: number;
+    endMs: number;
+}
+
 const OffersPage: React.FC<OffersPageProps> = ({ setPage }) => {
     const { promotions: rawPromotions } = useDatabase();
     const [timeLeft, setTimeLeft] = useState({
@@ -33,33 +39,50 @@ const OffersPage: React.FC<OffersPageProps> = ({ setPage }) => {
         buttonLink: offer.buttonLink || offer.button_link
     });
 
-    const promotions = useMemo(() => rawPromotions.map(normalizePromotion), [rawPromotions]);
+    /* BOLT OPTIMIZATION: Pre-calculate offer start/end timestamps when promotions change to avoid parsing Date strings in every 1s interval execution */
+    const promotionsWithTimestamps = useMemo<PromotionWithTimestamps[]>(() => {
+        const getOfferDateTime = (offer: PromotionalCard, isEnd: boolean) => {
+            const dateValue = isEnd ? offer.endDate : offer.startDate;
+            const timeValue = (isEnd ? offer.endTime : offer.startTime) || (isEnd ? '23:59' : '00:00');
+            const parsed = new Date(`${dateValue}T${timeValue}:00`);
+            if (Number.isNaN(parsed.getTime())) {
+                return new Date(dateValue);
+            }
+            return parsed;
+        };
 
-    const getOfferDateTime = (offer: PromotionalCard, isEnd: boolean) => {
-        const dateValue = isEnd ? offer.endDate : offer.startDate;
-        const timeValue = (isEnd ? offer.endTime : offer.startTime) || (isEnd ? '23:59' : '00:00');
-        const parsed = new Date(`${dateValue}T${timeValue}:00`);
-        if (Number.isNaN(parsed.getTime())) {
-            return new Date(dateValue);
-        }
-        return parsed;
-    };
+        return rawPromotions.map((rawOffer) => {
+            const offer = normalizePromotion(rawOffer);
+            return {
+                offer,
+                startMs: getOfferDateTime(offer, false).getTime(),
+                endMs: getOfferDateTime(offer, true).getTime()
+            };
+        });
+    }, [rawPromotions]);
 
     useEffect(() => {
         const updateCountdown = () => {
-            const now = new Date();
-            const active = promotions.filter((offer) => {
-                if (!offer.isActive) return false;
-                const start = getOfferDateTime(offer, false);
-                const end = getOfferDateTime(offer, true);
-                return now >= start && now <= end;
-            });
-            if (active.length === 0) {
+            const nowMs = Date.now();
+            let nextEnd = Infinity;
+            let hasActive = false;
+
+            for (let i = 0; i < promotionsWithTimestamps.length; i++) {
+                const item = promotionsWithTimestamps[i];
+                if (item.offer.isActive && nowMs >= item.startMs && nowMs <= item.endMs) {
+                    hasActive = true;
+                    if (item.endMs < nextEnd) {
+                        nextEnd = item.endMs;
+                    }
+                }
+            }
+
+            if (!hasActive) {
                 setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
                 return;
             }
-            const nextEnd = Math.min(...active.map((offer) => getOfferDateTime(offer, true).getTime()));
-            const diffMs = Math.max(0, nextEnd - now.getTime());
+
+            const diffMs = Math.max(0, nextEnd - nowMs);
             const totalSeconds = Math.floor(diffMs / 1000);
             const days = Math.floor(totalSeconds / 86400);
             const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -71,9 +94,7 @@ const OffersPage: React.FC<OffersPageProps> = ({ setPage }) => {
         updateCountdown();
         const timer = setInterval(updateCountdown, 1000);
         return () => clearInterval(timer);
-    }, [promotions]);
-
-
+    }, [promotionsWithTimestamps]);
 
     const handlePromotionClick = (offer: PromotionalCard) => {
         const link = (offer.buttonLink || '').trim();
@@ -86,13 +107,10 @@ const OffersPage: React.FC<OffersPageProps> = ({ setPage }) => {
         setPage(normalized as Page);
     };
 
-    const now = new Date();
-    const activePromotions = promotions.filter((offer) => {
-        if (!offer.isActive) return false;
-        const start = getOfferDateTime(offer, false);
-        const end = getOfferDateTime(offer, true);
-        return now >= start && now <= end;
-    });
+    const nowMs = Date.now();
+    const activePromotions = promotionsWithTimestamps
+        .filter((item) => item.offer.isActive && nowMs >= item.startMs && nowMs <= item.endMs)
+        .map((item) => item.offer);
 
     return (
         <div className="animate-fade-in max-w-6xl mx-auto px-4 py-12">
