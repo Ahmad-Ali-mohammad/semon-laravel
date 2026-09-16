@@ -31,8 +31,9 @@ const ShowcasePage: React.FC<ShowcasePageProps> = ({ setPage }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [viewMode, setViewMode] = useState<CardVariant>('grid');
 
+    // ⚡ Bolt: Direct products.filter avoids redundant shallow copy [...products] since filter returns a new array.
     const filteredReptiles = useMemo(() => {
-        let result = [...products].filter(reptile => {
+        const result = products.filter(reptile => {
             if (filters.categories.length > 0 && !filters.categories.includes(reptile.category)) {
                 return false;
             }
@@ -48,7 +49,7 @@ const ShowcasePage: React.FC<ShowcasePageProps> = ({ setPage }) => {
             return true;
         });
 
-        // Sorting
+        // Sorting in-place on the newly created filtered array
         switch (sortBy) {
             case 'price-asc': result.sort((a, b) => a.price - b.price); break;
             case 'price-desc': result.sort((a, b) => b.price - a.price); break;
