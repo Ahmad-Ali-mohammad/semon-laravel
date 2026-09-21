@@ -32,7 +32,8 @@ const SuppliesPage: React.FC<SuppliesPageProps> = ({ setPage }) => {
     const [viewMode, setViewMode] = useState<CardVariant>('grid');
 
     const filteredSupplies = useMemo(() => {
-        let result = [...supplies].filter(supply => {
+        // BOLT OPTIMIZATION: Calling .filter() directly on supplies avoids redundant array copying ([...supplies]) and reduces GC overhead
+        let result = supplies.filter(supply => {
             if (filters.categories.length > 0 && !filters.categories.includes(supply.category)) {
                 return false;
             }
