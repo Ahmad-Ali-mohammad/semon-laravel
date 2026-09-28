@@ -32,7 +32,9 @@ const ShowcasePage: React.FC<ShowcasePageProps> = ({ setPage }) => {
     const [viewMode, setViewMode] = useState<CardVariant>('grid');
 
     const filteredReptiles = useMemo(() => {
-        let result = [...products].filter(reptile => {
+        // BOLT OPTIMIZATION: Call .filter directly on products instead of creating a shallow copy [...products].
+        // Array.prototype.filter already creates and returns a new array, avoiding redundant array allocations and garbage collection overhead.
+        let result = products.filter(reptile => {
             if (filters.categories.length > 0 && !filters.categories.includes(reptile.category)) {
                 return false;
             }
