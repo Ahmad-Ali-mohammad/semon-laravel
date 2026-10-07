@@ -32,7 +32,9 @@ const ShowcasePage: React.FC<ShowcasePageProps> = ({ setPage }) => {
     const [viewMode, setViewMode] = useState<CardVariant>('grid');
 
     const filteredReptiles = useMemo(() => {
-        let result = [...products].filter(reptile => {
+        // ⚡ BOLT OPTIMIZATION: Avoid spread operator [...products] before .filter()
+        // .filter() creates a new array directly, so spread operator creates unnecessary array copy and GC overhead.
+        let result = products.filter(reptile => {
             if (filters.categories.length > 0 && !filters.categories.includes(reptile.category)) {
                 return false;
             }
