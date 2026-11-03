@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useWishlist } from '../hooks/useWishlist';
 import { useDatabase } from '../contexts/DatabaseContext';
 import ReptileCard from '../components/ReptileCard';
@@ -14,7 +14,15 @@ const WishlistPage: React.FC<WishlistPageProps> = ({ setPage }) => {
     const { user } = useAuth();
     const { wishlist } = useWishlist();
     const { products } = useDatabase();
-    const wishlistedReptiles = products.filter(reptile => wishlist.includes(reptile.id));
+
+    // BOLT OPTIMIZATION:
+    // 1. Convert wishlist array of IDs to a Set for O(1) membership lookups, reducing filtering complexity
+    //    from O(N * M) to O(N + M).
+    // 2. Wrap derived wishlisted products in useMemo to prevent redundant array allocation and filtering on re-renders.
+    const wishlistedReptiles = useMemo(() => {
+        const wishlistSet = new Set(wishlist);
+        return products.filter(reptile => wishlistSet.has(reptile.id));
+    }, [products, wishlist]);
 
     if (!user) {
         return (
